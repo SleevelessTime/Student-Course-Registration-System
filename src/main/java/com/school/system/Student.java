@@ -1,7 +1,9 @@
 package com.school.system;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Öğrenci sınıfı.
@@ -12,6 +14,7 @@ public class Student implements Registrable {
     private String firstName;
     private String lastName;
     private List<Course> registeredCourses;
+    private Map<Course, Double> grades; // Ders -> Not (4.0 üzerinden)
     private double gpa;
 
     public Student(int id, String firstName, String lastName) {
@@ -19,6 +22,7 @@ public class Student implements Registrable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.registeredCourses = new ArrayList<>();
+        this.grades = new HashMap<>();
         this.gpa = 0.0;
     }
 
@@ -75,13 +79,42 @@ public class Student implements Registrable {
         }
     }
 
+    /**
+     * Derse not gir ve GPA'yı güncelle.
+     * @param course Ders
+     * @param grade Not (4.0 üzerinden: AA=4.0, BA=3.5, BB=3.0, CB=2.5, CC=2.0, DC=1.5, DD=1.0, FF=0)
+     */
+    public void setGrade(Course course, double grade) {
+        if (registeredCourses.contains(course)) {
+            grades.put(course, grade);
+            calculateGPA();
+            System.out.println(course.getCourseCode() + " için not girildi: " + grade);
+        } else {
+            System.out.println("Hata: Bu derse kayıtlı değilsiniz.");
+        }
+    }
+
+    /**
+     * GPA hesapla: Toplam(Kredi * Not) / Toplam Kredi
+     */
+    private void calculateGPA() {
+        double totalPoints = 0;
+        int totalCredits = 0;
+        for (Map.Entry<Course, Double> entry : grades.entrySet()) {
+            int credit = entry.getKey().getCredit();
+            totalPoints += credit * entry.getValue();
+            totalCredits += credit;
+        }
+        this.gpa = totalCredits > 0 ? totalPoints / totalCredits : 0.0;
+    }
+
     // Getters and Setters
     public int getId() { return id; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public List<Course> getRegisteredCourses() { return registeredCourses; }
     public double getGpa() { return gpa; }
-    public void setGpa(double gpa) { this.gpa = gpa; }
+    public Map<Course, Double> getGrades() { return grades; }
 
     @Override
     public String toString() {

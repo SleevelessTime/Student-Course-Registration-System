@@ -70,6 +70,23 @@ public class Main {
                 case "5":
                     System.out.println("Toplam Öğrenim Ücreti: " + currentStudent.calculateTuition() + " TL");
                     break;
+                case "6":
+                    System.out.print("Not girilecek ders kodu: ");
+                    String gradeCode = scanner.nextLine();
+                    System.out.print("Not (4.0 üzerinden, örn: 3.5): ");
+                    try {
+                        double grade = Double.parseDouble(scanner.nextLine());
+                        catalog.findCourseByCode(gradeCode).ifPresentOrElse(
+                            course -> currentStudent.setGrade(course, grade),
+                            () -> System.out.println("Ders bulunamadı.")
+                        );
+                    } catch (NumberFormatException e) {
+                        System.out.println("Geçersiz not.");
+                    }
+                    break;
+                case "7":
+                    System.out.printf("GPA: %.2f%n", currentStudent.getGpa());
+                    break;
                 case "0":
                     running = false;
                     System.out.println("Çıkış yapılıyor...");
@@ -88,6 +105,8 @@ public class Main {
         System.out.println("3. Ders Bırak");
         System.out.println("4. Kayıtlı Derslerimi Gör");
         System.out.println("5. Öğrenim Ücretini Hesapla");
+        System.out.println("6. Derse Not Gir");
+        System.out.println("7. GPA Görüntüle");
         System.out.println("0. Çıkış");
         System.out.print("Seçiminiz: ");
     }
