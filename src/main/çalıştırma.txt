@@ -1,0 +1,93 @@
+================================================================================
+                    SUNUM İÇİN TERMİNAL KOMUTLARI
+================================================================================
+
+1. PROJE DİZİNİNE GİT
+---------------------
+cd C:\Users\Oguzhan\Desktop\nesne
+
+
+2. PROJEYİ DERLE (Compile) - SQLite ile
+-----------------------------------------
+javac -d bin -encoding UTF-8 -cp "lib/*" src/main/java/com/school/system/*.java src/main/java/com/school/system/ui/*.java
+
+
+3. KONSOL VERSİYONUNU ÇALIŞTIR (SQLite ile)
+-------------------------------------------
+java -cp "bin;lib/*" com.school.system.Main
+
+Demo senaryosu:
+- 101 gir (Lisans öğrencisi) veya 201 (Yüksek Lisans)
+- 1 -> Ders listesi
+- 2 -> CS101 kayıt ol
+- 2 -> CS102 kayıt ol (ÇAKIŞMA HATASI göster!)
+- 2 -> MATH101 kayıt ol
+- 4 -> Kayıtlı dersler
+- 6 -> CS101 not gir -> 4.0
+- 6 -> MATH101 not gir -> 3.0
+- 7 -> GPA göster (3.43 olmalı)
+- 5 -> Ücret hesapla
+- 0 -> Çıkış
+
+
+4. VERİTABANI İÇERİĞİNİ GÖRÜNTÜLE
+---------------------------------
+java -cp "bin;lib/*" com.school.system.DatabaseViewer
+
+
+5. GUI VERSİYONUNU ÇALIŞTIR
+---------------------------
+java -cp "bin;lib/*" com.school.system.ui.MainFrame
+
+Demo senaryosu:
+- Lisans veya Yüksek Lisans seç
+- Ders Kataloğu sekmesi -> Ders seç -> Kayıt ol
+- Derslerim sekmesi -> Kayıtlı dersleri göster
+- Notlar & GPA sekmesi -> Not gir -> GPA göster
+
+
+6. UNIT TESTLERİ ÇALIŞTIR (ÖNEMLİ!)
+-----------------------------------
+java -jar junit-platform-console-standalone-1.9.3.jar --class-path "bin;lib/*" --select-class com.school.system.StudentTest
+
+Beklenen çıktı: 6 test successful, 0 test failed
+- testRegisterForCourseSuccess
+- testRegisterForDuplicateCourse  
+- testTimeConflict
+- testCalculateTuition
+- testGraduateStudentTuition
+- testGPACalculation
+
+
+7. GIT GEÇMİŞİNİ GÖSTER
+-----------------------
+git log --oneline
+
+
+8. GIT İSTATİSTİKLERİ
+---------------------
+git log --oneline | Measure-Object -Line
+
+
+9. VERİTABANINI SIFIRLA (Temiz başlangıç)
+-----------------------------------------
+Remove-Item school.db -ErrorAction SilentlyContinue
+java -cp "bin;lib/*" com.school.system.Main
+
+
+================================================================================
+                         HIZLI REFERANS
+================================================================================
+Derleme:     javac -d bin -encoding UTF-8 -cp "lib/*" src/main/java/com/school/system/*.java src/main/java/com/school/system/ui/*.java
+Konsol:      java -cp "bin;lib/*" com.school.system.Main
+GUI:         java -cp "bin;lib/*" com.school.system.ui.MainFrame
+Test:        java -jar junit-platform-console-standalone-1.9.3.jar --class-path "bin;lib/*" --select-class com.school.system.StudentTest
+DB Görme:    java -cp "bin;lib/*" com.school.system.DatabaseViewer
+DB Sıfırla:  Remove-Item school.db
+================================================================================
+
+NOT: SQLite kütüphanesi lib/ klasöründe olmalı:
+  - sqlite-jdbc-3.45.1.0.jar
+  - slf4j-api-2.0.9.jar  
+  - slf4j-simple-2.0.9.jar
+================================================================================

@@ -11,13 +11,23 @@ import java.util.Optional;
  */
 public class CourseCatalog {
     private List<Course> courses;
+    private DatabaseManager db;
 
     public CourseCatalog() {
         this.courses = new ArrayList<>();
+        this.db = null;
+    }
+
+    public CourseCatalog(DatabaseManager db) {
+        this.db = db;
+        this.courses = db.getAllCourses();
     }
 
     public void addCourse(Course course) {
         courses.add(course);
+        if (db != null) {
+            db.saveCourse(course);
+        }
     }
 
     public void removeCourse(Course course) {
@@ -40,5 +50,11 @@ public class CourseCatalog {
             System.out.println(c);
         }
         System.out.println("----------------------");
+    }
+
+    public void refreshFromDatabase() {
+        if (db != null) {
+            this.courses = db.getAllCourses();
+        }
     }
 }

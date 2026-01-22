@@ -8,11 +8,18 @@ import java.util.Scanner;
  * Entry point for the Student Course Registration System.
  */
 public class Main {
-    private static CourseCatalog catalog = new CourseCatalog();
+    private static CourseCatalog catalog;
     private static Student currentStudent; // Simüle edilmiş giriş yapan öğrenci
+    private static DatabaseManager db;
 
     public static void main(String[] args) {
-        initializeData();
+        // Veritabanı bağlantısını başlat
+        db = DatabaseManager.getInstance();
+        db.initializeDefaultData();
+        
+        // Ders kataloğunu veritabanından yükle
+        catalog = new CourseCatalog(db);
+        
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -30,9 +37,10 @@ public class Main {
             System.out.println("Geçersiz ID.");
         }
 
-        if (studentId == 201) {
-            currentStudent = new GraduateStudent(201, "Veli", "Yılmaz", "AI Research");
-        } else {
+        // Öğrenciyi veritabanından getir
+        currentStudent = db.getStudentById(studentId);
+        if (currentStudent == null) {
+            System.out.println("Öğrenci bulunamadı, varsayılan öğrenci kullanılıyor.");
             currentStudent = new Student(101, "Ali", "Demir");
         }
         System.out.println("Hoşgeldin, " + currentStudent.getFirstName() + " (" + currentStudent.getClass().getSimpleName() + ")");
@@ -49,7 +57,11 @@ public class Main {
                     System.out.print("Kayıt olunacak ders kodu: ");
                     String code = scanner.nextLine();
                     catalog.findCourseByCode(code).ifPresentOrElse(
-                        course -> currentStudent.registerForCourse(course),
+                        course -> {
+                            if (currentStudent.registerForCourse(course)) {
+                                db.saveRegistration(currentStudent.getId(), course.getCourseCode(), null);
+                            }
+                        },
                         () -> System.out.println("Ders bulunamadı.")
                     );
                     break;
@@ -57,7 +69,10 @@ public class Main {
                     System.out.print("Bırakılacak ders kodu: ");
                     String dropCode = scanner.nextLine();
                     catalog.findCourseByCode(dropCode).ifPresentOrElse(
-                        course -> currentStudent.dropCourse(course),
+                        course -> {
+                            currentStudent.dropCourse(course);
+                            db.deleteRegistration(currentStudent.getId(), course.getCourseCode());
+                        },
                         () -> System.out.println("Ders bulunamadı.")
                     );
                     break;
@@ -77,7 +92,10 @@ public class Main {
                     try {
                         double grade = Double.parseDouble(scanner.nextLine());
                         catalog.findCourseByCode(gradeCode).ifPresentOrElse(
-                            course -> currentStudent.setGrade(course, grade),
+                            course -> {
+                                currentStudent.setGrade(course, grade);
+                                db.updateGrade(currentStudent.getId(), course.getCourseCode(), grade);
+                            },
                             () -> System.out.println("Ders bulunamadı.")
                         );
                     } catch (NumberFormatException e) {
@@ -89,6 +107,7 @@ public class Main {
                     break;
                 case "0":
                     running = false;
+                    db.close();
                     System.out.println("Çıkış yapılıyor...");
                     break;
                 default:
@@ -109,26 +128,5 @@ public class Main {
         System.out.println("7. GPA Görüntüle");
         System.out.println("0. Çıkış");
         System.out.print("Seçiminiz: ");
-    }
-
-    private static void initializeData() {
-        Instructor instructor1 = new Instructor(1, "Ahmet", "Hoca", "CS");
-        Instructor instructor2 = new Instructor(2, "Ayşe", "Prof", "Math");
-
-        Course c1 = new Course("CS101", "Intro to CS", 3, 30, "Monday", 9, 11);
-        c1.setInstructor(instructor1);
-        
-        Course c2 = new Course("MATH101", "Calculus I", 4, 40, "Tuesday", 10, 12);
-        c2.setInstructor(instructor2);
-
-        Course c3 = new Course("CS102", "Data Structures", 3, 25, "Monday", 10, 12); // CS101 ile çakışıyor (10-11 arası)
-        c3.setInstructor(instructor1);
-
-        Course c4 = new Course("ENG101", "English", 2, 50, "Friday", 14, 16);
-
-        catalog.addCourse(c1);
-        catalog.addCourse(c2);
-        catalog.addCourse(c3);
-        catalog.addCourse(c4);
     }
 }
