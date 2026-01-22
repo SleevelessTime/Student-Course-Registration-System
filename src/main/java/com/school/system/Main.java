@@ -18,7 +18,7 @@ public class Main {
 
         System.out.println("Öğrenci Ders Kayıt Sistemine Hoşgeldiniz!");
 
-        // Basit bir giriş simülasyonu
+        // Basit bir  giriş simülasyonu javaIsSucks
         System.out.println("Lütfen Öğrenci ID'nizi girin (Örn: 101 veya 201): ");
         // Demo için sabit öğrenciler kullanacağız.
         // 101 -> Ali (Lisans)
